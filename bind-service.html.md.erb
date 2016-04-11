@@ -58,6 +58,7 @@ $ pip install -r requirements.txt
 Now edit your `app.py` file to use this module and other native ones to connect to the database specified in your `VCAP_SERVICES` environment variable. We do this by importing the `MongoEngine` module and the native `json` module and by adding a route for the `/db` endpoint which returns the `kittens` collection of our MongoDB:
 
 ```python
+# import dependencies
 import os
 import json
 from flask import Flask
@@ -92,7 +93,7 @@ port = int(os.getenv('PORT', '3000'))
 # our base route which just returns a string
 @app.route('/')
 def hello_world():
-    return 'Hello World! I am running on port ' + str(port)
+    return 'Congratulations! Welcome to the Swisscom Application Cloud.
 
 # endpoint to create a new kitten (e.g. /create-kitten?name=garfield)
 @app.route('/create-kitten')
