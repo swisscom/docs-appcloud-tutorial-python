@@ -55,7 +55,7 @@ Then use pip to install our newly added dependencies:
 $ pip install -r requirements.txt
 </pre>
 
-Now edit your `hello.py` file to use this module to connect to the database specified in your `VCAP_SERVICES` environment variable. We do this by importing the `MongoEngine` module and the native `json` module and by adding a route for the `/db` endpoint which returns the `kittens` collection of our MongoDB:
+Now edit your `app.py` file to use this module to connect to the database specified in your `VCAP_SERVICES` environment variable. We do this by importing the `MongoEngine` module and the native `json` module and by adding a route for the `/db` endpoint which returns the `kittens` collection of our MongoDB:
 
 ```python
 import os

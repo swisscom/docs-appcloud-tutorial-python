@@ -7,7 +7,7 @@ owner: Tobias Fuhrimann
 
 In this step you’ll learn how to propagate a local change to the application through to <%= vars.product_short %>. As a simple change, we'll modify the title which the app shows.
 
-Change the `return` property in the `hello.py` file to 'I am awesome!'. Your final result should look something like this:
+Change the `return` property in the `app.py` file to 'I am awesome!'. Your final result should look something like this:
 
 ```python
 """CF Sample App Python"""
@@ -31,7 +31,7 @@ if __name__ == '__main__':
 Now test locally:
 
 <pre class="terminal">
-$ python hello.py
+$ python app.py
 </pre>
 
 Visiting your application at <a href="http://localhost:3000" target="_blank">http://localhost:3000</a>, you should see the changed title. **You are awesome!**
