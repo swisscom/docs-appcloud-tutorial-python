@@ -10,22 +10,19 @@ In this step you’ll learn how to propagate a local change to the application t
 Change the `return` property in the `app.py` file to 'I am awesome!'. Your final result should look something like this:
 
 ```python
-"""CF Sample App Python"""
-
 from flask import Flask
 import os
 
 app = Flask(__name__)
 
-port = int(os.getenv("PORT", "3000"))
+port = int(os.getenv('PORT', '3000'))
 
 @app.route('/')
 def hello_world():
-    return 'I am awesome!'
+    return 'I am awesome!.'
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=port)
-
 ```
 
 Now test locally:

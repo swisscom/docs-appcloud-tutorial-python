@@ -70,7 +70,7 @@ if 'VCAP_SERVICES' in os.environ:
     mongo_credentials = vcap_services['mongodb'][0]['credentials']
     mongo_uri = mongo_credentials['uri']
 else:
-    mongo_uri = 'mongodb://localhost/db'
+    mongo_uri = 'mongodb://localhost/test'
 
 app.config['MONGODB_SETTINGS'] = {
     'host': mongo_uri,
