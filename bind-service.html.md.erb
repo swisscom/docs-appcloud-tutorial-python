@@ -36,26 +36,26 @@ After that we restage the application as suggested so that it includes the new c
 $ cf restage my-python-app
 Restaging app my-app in org MyOrg / space MySpace as user@mydomain.com...
 -----> Downloaded app package (8.0K)
--------> Buildpack version 1.5.8
+-------> Buildpack version 1.5.4
 -----> Creating runtime environment
 
 ...
 </pre>
 
-Now we want to consume our new MongoDB from within our application. Use npm to add the `mongoose` npm module to your dependencies:
+Now we want to consume our new MongoDB from within our application. To do so, add the `Flask-MongoEngine` module to your dependencies in `requirements.txt`:
+
+```txt
+Flask>=0.10
+Flask-MongoEngine>=0.7.5
+```
+
+Then use pip to install our newly added dependencies:
 
 <pre class="terminal">
-$ npm install --save mongoose
-cf-sample-app-python@0.0.0 /.../cf-sample-app-python
-└─┬ mongoose@4.4.10
-  ├── async@1.5.2
-  ├── bson@0.4.21
-  ├── hooks-fixed@1.1.0
-
-  ...
+$ pip install -r requirements.txt
 </pre>
 
-Now edit your `app.js` file to use these modules to connect to the database specified in your `VCAP_SERVICES` environment variable. We do this by requiring the `mongoose` module and adding a route for the `/db` endpoint which returns the `kittens` collection of our MongoDB:
+Now edit your `hello.py` file to use this module to connect to the database specified in your `VCAP_SERVICES` environment variable. We do this by importing the `MongoEngine` module and the native `json` module and by adding a route for the `/db` endpoint which returns the `kittens` collection of our MongoDB:
 
 ```javascript
 var express = require('express');
