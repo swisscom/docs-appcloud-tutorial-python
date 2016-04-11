@@ -98,9 +98,10 @@ def hello_world():
 # endpoint to create a new kitten (e.g. /create-kitten?name=garfield)
 @app.route('/create-kitten')
 def add_kitten():
-    kitten = Kitten(name=request.args.get('name'))
+    kitten_name = request.args.get('name')
+    kitten = Kitten(name=kitten_name)
     kitten.save()
-    return 'Kitten %s added' % (request.args.get('name'))
+    return 'Kitten %s added' % (kitten_name)
 
 # endpoint to return all kittens
 @app.route('/db')
