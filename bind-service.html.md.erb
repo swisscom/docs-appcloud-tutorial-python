@@ -57,101 +57,52 @@ $ pip install -r requirements.txt
 
 Now edit your `hello.py` file to use this module to connect to the database specified in your `VCAP_SERVICES` environment variable. We do this by importing the `MongoEngine` module and the native `json` module and by adding a route for the `/db` endpoint which returns the `kittens` collection of our MongoDB:
 
-```javascript
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var mongoose = require('mongoose');
+```python
+import os
+import json
+from flask import Flask
+from flask.ext.mongoengine import MongoEngine
 
-var routes = require('./routes/index');
-var users = require('./routes/users');
+app = Flask(__name__)
 
-var app = express();
+if 'VCAP_SERVICES' in os.environ:
+    vcap_services = json.loads(os.environ['VCAP_SERVICES'])
+    mongo_credentials = vcap_services['mongodb'][0]['credentials']
+    mongo_uri = mongo_credentials['uri']
+else:
+    mongo_uri = 'mongodb://localhost/db'
 
-var mongoUrl = '';
-
-if (process.env.VCAP_SERVICES) {
-  var vcapServices = JSON.parse(process.env.VCAP_SERVICES);
-  mongoUrl = vcapServices.mongodb[0].credentials.uri;
-} else {
-  mongoUrl = 'mongodb://localhost/db';
+app.config['MONGODB_SETTINGS'] = {
+    'host': mongo_uri,
+    'db': 'db'
 }
 
-mongoose.connect(mongoUrl);
+db = MongoEngine(app)
 
-var kittySchema = mongoose.Schema({
-  name: 'string'
-});
+class Kitten(db.Document):
+    name = db.StringField(required=True)
 
-var Kitten = mongoose.model('Kitten', kittySchema);
+port = int(os.getenv('PORT', '3000'))
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+@app.route('/')
+def hello_world():
+    return 'Hello World! I am running on port ' + str(port)
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+@app.route('/db')
+def get_kittens():
+    kittens = Kitten.objects.get_or_404()
+    return jsonify(result = kittens)
 
-app.use('/', routes);
-app.use('/users', users);
-
-app.get('/db', function (req, res, next) {
-  Kitten.find(function (err, kittens) {
-    if (err) return next(err);
-
-    res.json(kittens);
-  })
-})
-
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
-});
-
-// error handlers
-
-// development error handler
-// will print stacktrace
-if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-      message: err.message,
-      error: err
-    });
-  });
-}
-
-// production error handler
-// no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-  res.status(err.status || 500);
-  res.render('error', {
-    message: err.message,
-    error: {}
-  });
-});
-
-
-module.exports = app;
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=port)
 ```
 
 This ensures that when you access your app using the `/db` route, it will return all the kittens stored in your database. Currently there are no kittens so it will return an empty array. Sad...
 
 The line
 
-```javascript
-if (process.env.VCAP_SERVICES) {
+```python
+if 'VCAP_SERVICES' in os.environ:
 ```
 
 checks if the app is running in the cloud. If not, it falls back to the default local MongoDB url. This allows you to run your app locally as well as in the cloud without having to configure anything differently. So let's push it to the cloud using
