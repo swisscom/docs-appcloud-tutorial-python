@@ -55,49 +55,67 @@ Then use pip to install our newly added dependencies:
 $ pip install -r requirements.txt
 </pre>
 
-Now edit your `app.py` file to use this module to connect to the database specified in your `VCAP_SERVICES` environment variable. We do this by importing the `MongoEngine` module and the native `json` module and by adding a route for the `/db` endpoint which returns the `kittens` collection of our MongoDB:
+Now edit your `app.py` file to use this module and other native ones to connect to the database specified in your `VCAP_SERVICES` environment variable. We do this by importing the `MongoEngine` module and the native `json` module and by adding a route for the `/db` endpoint which returns the `kittens` collection of our MongoDB:
 
 ```python
 import os
 import json
 from flask import Flask
+from flask import request
+from flask import jsonify
 from flask.ext.mongoengine import MongoEngine
 
+# bootstrap the app
 app = Flask(__name__)
 
+# check if running in the cloud and set MongoDB settings accordingly
 if 'VCAP_SERVICES' in os.environ:
     vcap_services = json.loads(os.environ['VCAP_SERVICES'])
     mongo_credentials = vcap_services['mongodb'][0]['credentials']
     mongo_uri = mongo_credentials['uri']
 else:
-    mongo_uri = 'mongodb://localhost/test'
+    mongo_uri = 'mongodb://localhost/db'
 
 app.config['MONGODB_SETTINGS'] = {
-    'host': mongo_uri,
-    'db': 'db'
+    'host': mongo_uri
 }
 
+# bootstrap our app
 db = MongoEngine(app)
 
+# create the Kitten class which serves as a model for kittens stored in MongoDB
 class Kitten(db.Document):
     name = db.StringField(required=True)
 
+# set the port dynamically with a default of 3000 for local development
 port = int(os.getenv('PORT', '3000'))
 
+# our base route which just returns a string
 @app.route('/')
 def hello_world():
     return 'Hello World! I am running on port ' + str(port)
 
+# endpoint to create a new kitten (e.g. /create-kitten?name=garfield)
+@app.route('/create-kitten')
+def add_kitten():
+    kitten = Kitten(name=request.args.get('name'))
+    kitten.save()
+    return 'Kitten added'
+
+# endpoint to return all kittens
 @app.route('/db')
 def get_kittens():
-    kittens = Kitten.objects.get_or_404()
+    kittens = Kitten.objects.to_json()
     return jsonify(result = kittens)
 
+# start the app
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=port)
 ```
 
 This ensures that when you access your app using the `/db` route, it will return all the kittens stored in your database. Currently there are no kittens so it will return an empty array. Sad...
+
+But you can create new kittens by hitting the `create-kitten` endpoint with the kitten's name as a URL parameter (e.g. at `/create-kitten?name=garfield`).
 
 The line
 
