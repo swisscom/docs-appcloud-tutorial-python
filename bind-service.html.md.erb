@@ -100,7 +100,7 @@ def hello_world():
 def add_kitten():
     kitten = Kitten(name=request.args.get('name'))
     kitten.save()
-    return 'Kitten added'
+    return 'Kitten %s added' % (request.args.get('name'))
 
 # endpoint to return all kittens
 @app.route('/db')
