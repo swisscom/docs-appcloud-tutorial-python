@@ -96,7 +96,7 @@ def hello_world():
     return 'Congratulations! Welcome to the Swisscom Application Cloud.'
 
 # endpoint to create a new kitten (e.g. /create-kitten?name=garfield)
-@app.route('/create-kitten')
+@app.route('/create-kitten', methods=['POST'])
 def add_kitten():
     kitten_name = request.args.get('name')
     kitten = Kitten(name=kitten_name)
